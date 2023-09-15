@@ -1,0 +1,483 @@
+openapi: 3.0.0
+info:
+  title: backend
+  version: '1.6'
+servers:
+  - url: http://127.0.0.1:8080/api/v1
+    description: localhost
+paths:
+  /login:
+    get:
+      tags:
+        - "Аутентификация"
+      summary: "аутентификация"
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/LogoPass'
+      responses:
+        "200":
+          $ref: '#/components/responses/User'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "401":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /manager/is-active/{id}:
+    put:
+      tags:
+        - "Менеджеры"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: "id компании"
+          required: true
+      summary: "обновление поля active на противоположное"
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /manager/full-access/{id}:
+    put:
+      tags:
+        - "Менеджеры"
+      summary: "обновление поля full_access на противоположное"
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: "id менеджера"
+          required: true
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /manager:
+    #  /getUserData
+    get:
+      tags:
+        - "Менеджеры"
+      summary: "получение данных менеджера"
+      responses:
+        "200":
+          $ref: '#/components/responses/GetManager'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+#    /changeUserData
+    put:
+      tags:
+        - "Менеджеры"
+      summary: "изменение данных менеджера"
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/UpdateUser'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /client/is-new:
+    #    /setClientChecked
+    post:
+      tags:
+        - Клиенты
+      summary: уставливает значение поля new таблицы Clients в false
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/Id'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /clients:
+#    /getClients
+    get:
+      tags:
+        - Клиенты
+      summary: получение данных клиентов
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/GetClients'
+      responses:
+        "200":
+          $ref:  '#/components/responses/GetDiagnostics'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /client/{id}:
+    get:
+      tags:
+        - Клиенты
+      summary: получение данных клиента
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: "id компании"
+          required: true
+      responses:
+        "200":
+          $ref: '#/components/responses/GetClient'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /client/is-archive:
+#    /setClientArchive
+    post:
+      tags:
+        - Клиенты
+      summary: устанавливает значение поля in_archive таблицы Clients в противоположное существующему
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/Id'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /client/result:
+    #    /addResults
+    post:
+      tags:
+        - Клиенты
+      summary: добавление результатов клиенту
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/AddResult'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /manager/add:
+    #    /addManager
+    post:
+      tags:
+        - Менеджеры
+      summary: добавление нового менеджера
+      requestBody:
+        required: true
+        $ref: '#/components/requestBodies/CreateManager'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+  /managers:
+#    /getAllManagers
+    get:
+      tags:
+        - Менеджеры
+      summary: получение данных о менеджерах
+      responses:
+        "200":
+          $ref: '#/components/responses/Users'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
+components:
+  requestBodies:
+    AddResult:
+      description:  добавление результата
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Result'
+    CreateManager:
+      description: добавление менеджера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Manager'
+    Id:
+      description: успешно
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: integer
+    GetClients:
+      description: успешно
+      content:
+        application/json:
+          schema:
+            properties:
+              id:
+                type: integer
+              is_admin:
+                type: boolean
+    Success:
+      description: успешно
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Success'
+    UpdateUser:
+      description: обновление данных менеджера
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateUser'
+    LogoPass:
+      description: логин
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Login'
+  responses:
+    GetClient:
+      description: успешно
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Client'
+    Users:
+      description: успешно
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetManager'
+    GetDiagnostics:
+      description: успешно
+      content:
+        application/json:
+          schema:
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Client'
+    Success:
+      description: успешно
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Success'
+    GetManager:
+      description: данные о менеджере
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetManager'
+    User:
+      description: информация о пользователе
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    BadRequest:
+      description: запрос не выполнен
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    InternalServerError:
+      description: ошибка сервера
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: доступ запрещён
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    UnAuth:
+      description: пользователь не авторизован
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    CustomError:
+      description: ошибка
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Err'
+  schemas:
+    Result:
+      type: object
+      properties:
+        manager_id:
+          type: integer
+        name:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+        new:
+          type: boolean
+        in_archive:
+          type: boolean
+        result:
+          type: string
+        date:
+          type: integer
+    Manager:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: string
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+        manager_id:
+          type: integer
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        new:
+          type: boolean
+        in_archive:
+          type: boolean
+        results:
+          type: array
+          items:
+            type: object
+        date:
+          type: integer
+    GetClients:
+      type: object
+      properties:
+        id:
+          type: integer
+        is_admin:
+          type: boolean
+    Diagnostics:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        link:
+          type: string
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+    Login:
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    Err:
+      type: object
+      properties:
+        error:
+          type: boolean
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: string
+        is_admin:
+          type: boolean
+        is_active:
+          type: boolean
+    GetManager:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: string
+        is_admin:
+          type: boolean
+        is_active:
+          type: boolean
+    UpdateUser:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        phone:
+          type: string
+      required:
+        - id
+        - login
+        - password
+        - name
+        - surname
+        - phone
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: текст ошибки
+      required:
+        - code
