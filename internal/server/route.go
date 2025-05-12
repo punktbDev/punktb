@@ -11,11 +11,11 @@ import (
 func (s *server) middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ck := getCookies(r)
-		h := getHeaders(r)
+		//h := getHeaders(r)
 
 		zap.L().Info(fmt.Sprintf("%s %s %s, cookies: %s", r.Method, r.RequestURI,
 			r.RemoteAddr, ck))
-		zap.L().Debug("headers: " + h)
+		//zap.L().Debug("headers: " + h)
 
 		if r.Method == http.MethodPost && r.URL.String() == "/api/v1/client/result" {
 			next.ServeHTTP(w, r)

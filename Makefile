@@ -5,7 +5,7 @@ include .env
 save:
 	docker save backend:${TAG} > ~/Downloads/backend.tar
 build:
-	docker-compose build
+	docker compose build
 migrate_init:
 	migrate create -ext sql -dir ./migrations -seq init
 migrate_up:

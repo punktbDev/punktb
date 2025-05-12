@@ -3,12 +3,15 @@ package controller
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gorilla/mux"
 	"gitlab.com/freelance/punkt-b/backend/internal/database"
 	"gitlab.com/freelance/punkt-b/backend/internal/dto"
 	"gitlab.com/freelance/punkt-b/backend/internal/service"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type (
@@ -130,9 +133,57 @@ func (c *client) GetClients(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Transfer-Encoding", "chunked")
+
 	if len(cls) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 	} else {
-		SendResponse(http.StatusOK, w, cls)
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			http.Error(w, "Streaming not supported", http.StatusInternalServerError)
+			return
+		}
+
+		var b []byte
+		for i := 0; i < len(cls); i += 100 {
+			b, err = json.Marshal(cls[i : i+100])
+			if err != nil {
+				zap.L().Error("marshal", zap.Error(err))
+				continue
+			}
+
+			if _, err = fmt.Fprint(w, string(b)); err != nil {
+				zap.L().Error("write", zap.Error(err))
+				continue
+			}
+
+			// Флэш уничтожает буфер, делая данные доступными клиенту
+			flusher.Flush()
+			// Имитируем задержку между отправкой чанков
+			time.Sleep(100 * time.Millisecond)
+		}
 	}
+
+	//w.Header().Set("Content-Encoding", "gzip")
+	//gz := gzip.NewWriter(w)
+	//defer gz.Close() // Закрытие потока gzip в конце
+
+	//w.Header().Set("Content-Type", "application/json")
+	//w.WriteHeader(http.StatusOK)
+
+	//b, err := json.Marshal(cls)
+	//if err != nil {
+	//	zap.L().Error("marshal", zap.Error(err))
+	//}
+
+	//if _, err = io.WriteString(gz, string(b)); err != nil {
+	//	zap.L().Error("write", zap.Error(err))
+	//}
+	//io.WriteString(gz, "Sending large data more efficiently!\n")
+
+	//if err := json.NewEncoder(w).Encode(body); err != nil {
+	//	zap.L().Error("Encode", zap.Error(err))
+	//
+	//}
+	//SendResponse(http.StatusOK, w, cls)
 }

@@ -73,9 +73,10 @@ func (s *server) Run() error {
 	srv := http.Server{
 		Addr:              ":8080",
 		Handler:           handler,
-		ReadTimeout:       DefaultTimeout,
-		WriteTimeout:      DefaultTimeout,
-		ReadHeaderTimeout: DefaultTimeout,
+		ReadTimeout:       5 * time.Second,   // Таймаут на чтение данных (запроса) от клиента
+		WriteTimeout:      30 * time.Second,  // Таймаут на запись данных (ответа)
+		IdleTimeout:       120 * time.Second, // Таймаут для ожидания новых запросов на соединении
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 
 	zap.L().Info("server started")
