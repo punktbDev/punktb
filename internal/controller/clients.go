@@ -134,6 +134,7 @@ func (c *client) GetClients(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Transfer-Encoding", "chunked")
+	w.Header().Set("Content-Type", "application/json")
 
 	if len(cls) == 0 {
 		w.WriteHeader(http.StatusNoContent)
@@ -173,7 +174,6 @@ func (c *client) GetClients(w http.ResponseWriter, r *http.Request) {
 	//gz := gzip.NewWriter(w)
 	//defer gz.Close() // Закрытие потока gzip в конце
 
-	//w.Header().Set("Content-Type", "application/json")
 	//w.WriteHeader(http.StatusOK)
 
 	//b, err := json.Marshal(cls)
