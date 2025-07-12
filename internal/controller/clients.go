@@ -146,7 +146,12 @@ func (c *client) GetClients(w http.ResponseWriter, r *http.Request) {
 
 		var b []byte
 		for i := 0; i < len(cls); i += 100 {
-			b, err = json.Marshal(cls[i : i+100])
+			end := i + 100
+			if end > len(cls) {
+				end = len(cls)
+			}
+
+			b, err = json.Marshal(cls[i:end])
 			if err != nil {
 				zap.L().Error("marshal", zap.Error(err))
 				continue
