@@ -28,44 +28,11 @@ type (
 		GetAllManagers(w http.ResponseWriter, r *http.Request)
 		AddManager(w http.ResponseWriter, r *http.Request)
 		ChangeActive(w http.ResponseWriter, r *http.Request)
-		ChangeFullAccess(w http.ResponseWriter, r *http.Request)
 	}
 )
 
 func NewManager(srv service.Manager) Manager {
 	return &manager{srv: srv}
-}
-
-func (m *manager) ChangeFullAccess(w http.ResponseWriter, r *http.Request) {
-	mn := GetManager(r)
-	if !mn.IsAdmin {
-		m.err.BadRequest(w, errors.New(http.StatusText(http.StatusForbidden)), http.StatusForbidden)
-		return
-	}
-	vars := mux.Vars(r)
-	tId, ok := vars["id"]
-	if !ok {
-		m.err.BadRequest(w, errors.New(http.StatusText(http.StatusBadRequest)), http.StatusBadRequest)
-		return
-	}
-
-	id, err := strconv.Atoi(tId)
-	if err != nil {
-		m.err.BadRequest(w, err, http.StatusBadRequest)
-		return
-	}
-
-	if err = m.srv.ChangeFullAccess(id); err != nil {
-		if errors.Is(err, database.ErrManagerNotFound) {
-			m.err.BadRequest(w, err, http.StatusBadRequest)
-		} else {
-			m.err.BadRequest(w, err, http.StatusInternalServerError)
-		}
-
-		return
-	}
-
-	SendResponse(http.StatusOK, w, &dto.Response{Success: true})
 }
 
 func (m *manager) ChangeActive(w http.ResponseWriter, r *http.Request) {

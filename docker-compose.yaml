@@ -21,59 +21,59 @@ services:
     volumes:
       - ./certs:/certs
     network_mode: bridge
-  db:
-    image: postgres:14.8-alpine3.18
-    container_name: postgres
-    command:
-      - "postgres"
-      - "-c"
-      - "max_connections=50"
-      - "-c"
-      - "shared_buffers=1GB"
-      - "-c"
-      - "effective_cache_size=4GB"
-      - "-c"
-      - "work_mem=16MB"
-      - "-c"
-      - "maintenance_work_mem=512MB"
-      - "-c"
-      - "random_page_cost=1.1"
-      - "-c"
-      - "temp_file_limit=10GB"
-      - "-c"
-      - "log_min_duration_statement=200ms"
-      - "-c"
-      - "idle_in_transaction_session_timeout=10s"
-      - "-c"
-      - "lock_timeout=1s"
-      - "-c"
-      - "statement_timeout=60s"
-      - "-c"
-      - "shared_preload_libraries=pg_stat_statements"
-      - "-c"
-      - "pg_stat_statements.max=10000"
-      - "-c"
-      - "pg_stat_statements.track=all"
-    environment:
-      TZ: Europe/Moscow
-      POSTGRES_PASSWORD: ${PSQL_USERNAME}
-      POSTGRES_USER: ${PSQL_PASSWORD}
-      PGDATA: "/var/lib/postgresql/data/pgdata"
-    ports:
-      - "5432:5432"
-    volumes:
-      - ./migrations:/docker-entrypoint-initdb.d
-      - /tmp:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '1'
-          memory: 1G
-    networks:
-      - postgres
+#  db:
+#    image: postgres:14.8-alpine3.18
+#    container_name: postgres
+#    command:
+#      - "postgres"
+#      - "-c"
+#      - "max_connections=50"
+#      - "-c"
+#      - "shared_buffers=1GB"
+#      - "-c"
+#      - "effective_cache_size=4GB"
+#      - "-c"
+#      - "work_mem=16MB"
+#      - "-c"
+#      - "maintenance_work_mem=512MB"
+#      - "-c"
+#      - "random_page_cost=1.1"
+#      - "-c"
+#      - "temp_file_limit=10GB"
+#      - "-c"
+#      - "log_min_duration_statement=200ms"
+#      - "-c"
+#      - "idle_in_transaction_session_timeout=10s"
+#      - "-c"
+#      - "lock_timeout=1s"
+#      - "-c"
+#      - "statement_timeout=60s"
+#      - "-c"
+#      - "shared_preload_libraries=pg_stat_statements"
+#      - "-c"
+#      - "pg_stat_statements.max=10000"
+#      - "-c"
+#      - "pg_stat_statements.track=all"
+#    environment:
+#      TZ: Europe/Moscow
+#      POSTGRES_PASSWORD: ${PSQL_USERNAME}
+#      POSTGRES_USER: ${PSQL_PASSWORD}
+#      PGDATA: "/var/lib/postgresql/data/pgdata"
+#    ports:
+#      - "5432:5432"
+#    volumes:
+#      - ./migrations:/docker-entrypoint-initdb.d
+#      - /tmp:/var/lib/postgresql/data
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+#    restart: unless-stopped
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '1'
+#          memory: 1G
+#    networks:
+#      - postgres

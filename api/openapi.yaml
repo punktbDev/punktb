@@ -42,25 +42,6 @@ paths:
           $ref: '#/components/responses/CustomError'
         "500":
           $ref: '#/components/responses/CustomError'
-  /manager/full-access/{id}:
-    put:
-      tags:
-        - "Менеджеры"
-      summary: "обновление поля full_access на противоположное"
-      parameters:
-        - in: path
-          name: id
-          schema:
-            type: integer
-          description: "id менеджера"
-          required: true
-      responses:
-        "200":
-          $ref: '#/components/responses/Success'
-        "400":
-          $ref: '#/components/responses/CustomError'
-        "500":
-          $ref: '#/components/responses/CustomError'
   /manager:
     #  /getUserData
     get:
@@ -451,6 +432,8 @@ components:
           type: boolean
         is_active:
           type: boolean
+        available_diagnostics:
+          type: array
     UpdateUser:
       type: object
       properties:

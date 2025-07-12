@@ -16,7 +16,6 @@ type (
 		GetAllManagers() ([]dto.Manager, error)
 		AddManager(mn dto.Manager) error
 		ChangeActive(id int) error
-		ChangeFullAccess(id int) error
 	}
 )
 
@@ -34,14 +33,6 @@ func (m *manager) AddManager(mn dto.Manager) error {
 	})
 
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *manager) ChangeFullAccess(id int) error {
-	if err := m.db.Update(&dbModel.FullAccessManager{Id: id}); err != nil {
 		return err
 	}
 
@@ -76,12 +67,13 @@ func (m *manager) GetUserData(login, password string) (*dto.Manager, error) {
 
 func (m *manager) ChangeManagerData(ms *dto.Manager) error {
 	if err := m.db.Update(&dbModel.Manager{
-		Id:       ms.Id,
-		Login:    ms.Login,
-		Password: ms.Password,
-		Name:     ms.Name,
-		Surname:  ms.Surname,
-		Phone:    ms.Phone,
+		Id:                   ms.Id,
+		Login:                ms.Login,
+		Password:             ms.Password,
+		Name:                 ms.Name,
+		Surname:              ms.Surname,
+		Phone:                ms.Phone,
+		AvailableDiagnostics: ms.AvailableDiagnostics,
 	}); err != nil {
 		return err
 	}

@@ -4,15 +4,15 @@ import validation "github.com/go-ozzo/ozzo-validation"
 
 type (
 	Manager struct {
-		Id           int    `json:"id"`
-		Login        string `json:"login,omitempty"`
-		Password     string `json:"password,omitempty""`
-		Name         string `json:"name"`
-		Surname      string `json:"surname"`
-		Phone        string `json:"phone"`
-		IsAdmin      bool   `json:"is_admin"`
-		IsActive     bool   `json:"is_active"`
-		IsFullAccess bool   `json:"is_full_access"`
+		Id                   int    `json:"id"`
+		Login                string `json:"login,omitempty"`
+		Password             string `json:"password,omitempty"`
+		Name                 string `json:"name"`
+		Surname              string `json:"surname"`
+		Phone                string `json:"phone"`
+		IsAdmin              bool   `json:"is_admin"`
+		IsActive             bool   `json:"is_active"`
+		AvailableDiagnostics []int  `json:"available_diagnostics"`
 	}
 )
 
