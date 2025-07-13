@@ -13,6 +13,7 @@ type (
 		IsAdmin              bool   `json:"is_admin"`
 		IsActive             bool   `json:"is_active"`
 		AvailableDiagnostics []int  `json:"available_diagnostics"`
+		IsFullAccess         bool   `json:"is_full_access"`
 	}
 )
 

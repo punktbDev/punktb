@@ -15,11 +15,20 @@ type (
 		GetAllManagers() ([]dto.Manager, error)
 		AddManager(mn dto.Manager) error
 		ChangeActive(id int) error
+		ChangeFullAccess(id int) error
 	}
 )
 
 func NewManager(dm domain.Manager) Manager {
 	return &manager{dm: dm}
+}
+
+func (m *manager) ChangeFullAccess(id int) error {
+	if err := m.dm.ChangeFullAccess(id); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *manager) ChangeActive(id int) error {

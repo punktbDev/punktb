@@ -16,6 +16,7 @@ type (
 		GetAllManagers() ([]dto.Manager, error)
 		AddManager(mn dto.Manager) error
 		ChangeActive(id int) error
+		ChangeFullAccess(id int) error
 	}
 )
 
@@ -33,6 +34,14 @@ func (m *manager) AddManager(mn dto.Manager) error {
 	})
 
 	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *manager) ChangeFullAccess(id int) error {
+	if err := m.db.Update(&dbModel.FullAccessManager{Id: id}); err != nil {
 		return err
 	}
 

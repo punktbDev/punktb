@@ -23,6 +23,7 @@ type (
 		Phone                string `json:"phone"`
 		IsAdmin              bool   `json:"is_admin"`
 		AvailableDiagnostics []int
+		FullAccessManager    bool
 		Secret               string `json:"-"`
 	}
 	ActiveManager struct {
@@ -32,6 +33,19 @@ type (
 		Id int
 	}
 )
+
+func (f *FullAccessManager) Update(ctx context.Context, conn *pgxpool.Conn) error {
+	tag, err := conn.Exec(ctx, `UPDATE managers SET full_access = NOT (SELECT full_access FROM managers WHERE id = $1) WHERE id = $2`, f.Id, f.Id)
+	if err != nil {
+		return err
+	}
+
+	if tag.RowsAffected() == 0 {
+		return ErrManagerNotFound
+	}
+
+	return nil
+}
 
 func (m *ActiveManager) Update(ctx context.Context, conn *pgxpool.Conn) error {
 	var isAdmin bool
@@ -80,7 +94,7 @@ func (m *Manager) Update(ctx context.Context, conn *pgxpool.Conn) error {
 
 func (m *Manager) Read(ctx context.Context, conn *pgxpool.Conn) (interface{}, error) {
 	var ms []dto.Manager
-	rows, err := conn.Query(ctx, `SELECT id, login, password, name, surname, phone, active, is_admin, available_diagnostics  FROM managers`)
+	rows, err := conn.Query(ctx, `SELECT id, login, password, name, surname, phone, active, is_admin, available_diagnostics, full_access  FROM managers`)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +108,7 @@ func (m *Manager) Read(ctx context.Context, conn *pgxpool.Conn) (interface{}, er
 			a  sql.NullBool
 		)
 
-		if err = rows.Scan(&mn.Id, &mn.Login, &mn.Password, &mn.Name, &mn.Surname, &p, &a, &mn.IsAdmin, &mn.AvailableDiagnostics); err != nil {
+		if err = rows.Scan(&mn.Id, &mn.Login, &mn.Password, &mn.Name, &mn.Surname, &p, &a, &mn.IsAdmin, &mn.AvailableDiagnostics, &mn.IsFullAccess); err != nil {
 			return nil, err
 		}
 

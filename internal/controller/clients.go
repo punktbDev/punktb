@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"gitlab.com/freelance/punkt-b/backend/internal/dto"
 	"gitlab.com/freelance/punkt-b/backend/internal/service"
 	"go.uber.org/zap"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -139,56 +141,91 @@ func (c *client) GetClients(w http.ResponseWriter, r *http.Request) {
 	if len(cls) == 0 {
 		w.WriteHeader(http.StatusNoContent)
 	} else {
-		flusher, ok := w.(http.Flusher)
-		if !ok {
-			http.Error(w, "Streaming not supported", http.StatusInternalServerError)
-			return
-		}
-
-		var b []byte
-		for i := 0; i < len(cls); i += 100 {
-			end := i + 100
-			if end > len(cls) {
-				end = len(cls)
-			}
-
-			b, err = json.Marshal(cls[i:end])
-			if err != nil {
-				zap.L().Error("marshal", zap.Error(err))
-				continue
-			}
-
-			if _, err = fmt.Fprint(w, string(b)); err != nil {
-				zap.L().Error("write", zap.Error(err))
-				continue
-			}
-
-			// Флэш уничтожает буфер, делая данные доступными клиенту
-			flusher.Flush()
-			// Имитируем задержку между отправкой чанков
-			time.Sleep(100 * time.Millisecond)
-		}
+		sendChunked(w, cls)
+		//sendCompressed(w, cls)
 	}
 
-	//w.Header().Set("Content-Encoding", "gzip")
-	//gz := gzip.NewWriter(w)
-	//defer gz.Close() // Закрытие потока gzip в конце
+}
 
-	//w.WriteHeader(http.StatusOK)
+func sendCompressed(w http.ResponseWriter, cls []dto.Client) {
+	w.Header().Set("Content-Encoding", "gzip")
+	gz := gzip.NewWriter(w)
+	defer gz.Close() // Закрытие потока gzip в конце
 
-	//b, err := json.Marshal(cls)
-	//if err != nil {
-	//	zap.L().Error("marshal", zap.Error(err))
-	//}
+	w.WriteHeader(http.StatusOK)
 
-	//if _, err = io.WriteString(gz, string(b)); err != nil {
-	//	zap.L().Error("write", zap.Error(err))
-	//}
-	//io.WriteString(gz, "Sending large data more efficiently!\n")
+	b, err := json.Marshal(cls)
+	if err != nil {
+		zap.L().Error("marshal", zap.Error(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	//if err := json.NewEncoder(w).Encode(body); err != nil {
-	//	zap.L().Error("Encode", zap.Error(err))
-	//
-	//}
-	//SendResponse(http.StatusOK, w, cls)
+	if _, err = io.WriteString(gz, string(b)); err != nil {
+		zap.L().Error("write", zap.Error(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	io.WriteString(gz, "Sending large data more efficiently!\n")
+
+	if err = json.NewEncoder(w).Encode(b); err != nil {
+		zap.L().Error("Encode", zap.Error(err))
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	SendResponse(http.StatusOK, w, cls)
+}
+
+func sendChunked(w http.ResponseWriter, cls []dto.Client) {
+	flusher, ok := w.(http.Flusher)
+	if !ok {
+		http.Error(w, "Streaming not supported", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if _, err := fmt.Fprintf(w, "["); err != nil {
+		zap.L().Error("write start", zap.Error(err))
+		return
+	}
+	flusher.Flush()
+
+	for i := 0; i < len(cls); i += 100 {
+		end := i + 100
+		if end > len(cls) {
+			end = len(cls)
+		}
+
+		b, err := json.Marshal(cls[i:end])
+		if err != nil {
+			zap.L().Error("marshal", zap.Error(err))
+			continue
+		}
+
+		if i > 0 {
+			if _, err = fmt.Fprintf(w, ","); err != nil {
+				zap.L().Error("write comma", zap.Error(err))
+				continue
+			}
+			flusher.Flush()
+		}
+
+		if _, err = fmt.Fprintf(w, "%s", b); err != nil {
+			zap.L().Error("write chunk", zap.Error(err))
+			continue
+		}
+
+		flusher.Flush()
+		time.Sleep(100 * time.Millisecond)
+	}
+
+	if _, err := fmt.Fprintf(w, "]"); err != nil {
+		zap.L().Error("write end", zap.Error(err))
+		return
+	}
+	flusher.Flush()
 }

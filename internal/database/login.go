@@ -17,8 +17,8 @@ type (
 func (l *Login) Read(ctx context.Context, conn *pgxpool.Conn) (interface{}, error) {
 	var m dto.Manager
 	var p sql.NullString
-	if err := conn.QueryRow(ctx, "SELECT id, name, surname, phone, is_admin, available_diagnostics, active FROM managers WHERE login = $1 AND password = $2",
-		l.Login, l.Password).Scan(&m.Id, &m.Name, &m.Surname, &p, &m.IsAdmin, &m.AvailableDiagnostics, &m.IsActive); err != nil {
+	if err := conn.QueryRow(ctx, "SELECT id, name, surname, phone, is_admin, available_diagnostics, active, full_access FROM managers WHERE login = $1 AND password = $2",
+		l.Login, l.Password).Scan(&m.Id, &m.Name, &m.Surname, &p, &m.IsAdmin, &m.AvailableDiagnostics, &m.IsActive, &m.IsFullAccess); err != nil {
 		return nil, err
 	}
 
