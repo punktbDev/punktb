@@ -25,14 +25,16 @@ type (
 		Id int
 	}
 	ClientResult struct {
-		ManagerId int
-		Name      string
-		Phone     string
-		Email     string
-		New       bool
-		InArchive bool
-		Results   *dto.Result
-		Date      int
+		ManagerId         int
+		Name              string
+		Phone             string
+		Email             string
+		New               bool
+		InArchive         bool
+		Results           *dto.Result
+		Date              int
+		IsPhoneAdult      *bool
+		ContactPermission bool
 	}
 )
 
@@ -51,16 +53,16 @@ func (c *ClientResult) Create(ctx context.Context, conn *pgxpool.Conn) (int, err
 		}
 
 		results = append(results, c.Results)
-		_, err := conn.Exec(ctx, `UPDATE clients SET name=$1, phone=$2, new=$3, in_archive=$4, date=$5, results=$6 WHERE email=$7`,
-			c.Name, c.Phone, c.New, c.InArchive, c.Date, results, c.Email)
+		_, err = conn.Exec(ctx, `UPDATE clients SET name=$1, phone=$2, new=$3, in_archive=$4, date=$5, results=$6, is_phone_adult = COALESCE($7, is_phone_adult), contact_permission=$8 WHERE email=$9`,
+			c.Name, c.Phone, c.New, c.InArchive, c.Date, results, c.IsPhoneAdult, c.ContactPermission, c.Email)
 		if err != nil {
 			return 0, err
 		}
 	} else {
 		var results []*dto.Result
 		results = append(results, c.Results)
-		_, err := conn.Exec(ctx, `INSERT INTO clients (manager_id, name, phone, email, new, in_archive, date, results) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-			c.ManagerId, c.Name, c.Phone, c.Email, c.New, c.InArchive, c.Date, results)
+		_, err = conn.Exec(ctx, `INSERT INTO clients (manager_id, name, phone, email, new, in_archive, date, results, is_phone_adult, contact_permission) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+			c.ManagerId, c.Name, c.Phone, c.Email, c.New, c.InArchive, c.Date, results, false, true)
 		if err != nil {
 			return 0, err
 		}
@@ -98,8 +100,8 @@ func (c *Client) Update(ctx context.Context, conn *pgxpool.Conn) error {
 
 func (c *Client) Read(ctx context.Context, conn *pgxpool.Conn) (interface{}, error) {
 	var cl dto.Client
-	if err := conn.QueryRow(ctx, `SELECT id, manager_id, name, email, phone, new, in_archive, results, date FROM clients WHERE id=$1`,
-		c.Id).Scan(&cl.Id, &cl.ManagerId, &cl.Name, &cl.Email, &cl.Phone, &cl.New, &cl.InArchive, &cl.Results, &cl.Date); err != nil {
+	if err := conn.QueryRow(ctx, `SELECT id, manager_id, name, email, phone, new, in_archive, results, date, is_phone_adult, contact_permission FROM clients WHERE id=$1`,
+		c.Id).Scan(&cl.Id, &cl.ManagerId, &cl.Name, &cl.Email, &cl.Phone, &cl.New, &cl.InArchive, &cl.Results, &cl.Date, &cl.IsPhoneAdult, &cl.ContactPermission); err != nil {
 		if strings.Contains(err.Error(), "no rows in result set") {
 			return nil, ErrClientNotFound
 		}
@@ -128,7 +130,7 @@ func (g *GetClients) Read(ctx context.Context, conn *pgxpool.Conn) (interface{},
 
 	for rows.Next() {
 		var c dto.Client
-		if err = rows.Scan(&c.Id, &c.ManagerId, &c.Name, &c.Phone, &c.Email, &c.New, &c.InArchive, &c.Date, &c.Results); err != nil {
+		if err = rows.Scan(&c.Id, &c.ManagerId, &c.Name, &c.Phone, &c.Email, &c.New, &c.InArchive, &c.Date, &c.Results, &c.IsPhoneAdult, &c.ContactPermission); err != nil {
 			return nil, err
 		}
 

@@ -34,14 +34,16 @@ func (c *client) GetResultClient(id int) (*dto.Client, error) {
 
 func (c *client) AddResult(cl *dto.Client) error {
 	_, err := c.db.Create(&dbModel.ClientResult{
-		ManagerId: cl.ManagerId,
-		Name:      cl.Name,
-		Phone:     cl.Phone,
-		Email:     cl.Email,
-		New:       cl.New,
-		InArchive: cl.InArchive,
-		Results:   cl.Result,
-		Date:      cl.Date,
+		ManagerId:         cl.ManagerId,
+		Name:              cl.Name,
+		Phone:             cl.Phone,
+		Email:             cl.Email,
+		New:               cl.New,
+		InArchive:         cl.InArchive,
+		Results:           cl.Result,
+		Date:              cl.Date,
+		IsPhoneAdult:      cl.IsPhoneAdult,
+		ContactPermission: cl.ContactPermission,
 	})
 	if err != nil {
 		return err

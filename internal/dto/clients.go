@@ -6,16 +6,18 @@ import (
 
 type (
 	Client struct {
-		Id        int      `json:"id"`
-		ManagerId int      `json:"manager_id"`
-		Name      string   `json:"name"`
-		Email     string   `json:"email"`
-		Phone     string   `json:"phone"`
-		New       bool     `json:"new"`
-		InArchive bool     `json:"in_archive"`
-		Result    *Result  `json:"result,omitempty"`
-		Results   []Result `json:"results"`
-		Date      int      `json:"date"`
+		Id                int      `json:"id"`
+		ManagerId         int      `json:"manager_id"`
+		Name              string   `json:"name"`
+		Email             string   `json:"email"`
+		Phone             string   `json:"phone"`
+		New               bool     `json:"new"`
+		InArchive         bool     `json:"in_archive"`
+		Result            *Result  `json:"result,omitempty"`
+		Results           []Result `json:"results"`
+		Date              int      `json:"date"`
+		IsPhoneAdult      *bool    `json:"is_phone_adult"`
+		ContactPermission bool     `json:"contact_permission"`
 	}
 	Result struct {
 		Date         int                    `json:"date"`
