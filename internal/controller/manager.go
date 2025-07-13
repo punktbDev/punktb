@@ -166,19 +166,34 @@ func (m *manager) GetUserData(w http.ResponseWriter, r *http.Request) {
 
 func (m *manager) ChangeManagerData(w http.ResponseWriter, r *http.Request) {
 	decoder := json.NewDecoder(r.Body)
+	vars := mux.Vars(r)
 
+	i := vars["id"]
 	var mg dto.Manager
-	if err := decoder.Decode(&mg); err != nil {
+	if i == "" {
+		m.err.BadRequest(w, errors.New("manager id is missing"), http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(i)
+	if err != nil {
 		m.err.BadRequest(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if err := mg.ValidateUpdate(); err != nil {
+	if err = decoder.Decode(&mg); err != nil {
 		m.err.BadRequest(w, err, http.StatusBadRequest)
 		return
 	}
 
-	if err := m.srv.ChangeManagerData(&mg); err != nil {
+	mg.Id = id
+
+	if err = mg.ValidateUpdate(); err != nil {
+		m.err.BadRequest(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err = m.srv.ChangeManagerData(&mg); err != nil {
 		m.err.BadRequest(w, err, http.StatusInternalServerError)
 		return
 	}
