@@ -80,8 +80,8 @@ func (m *Manager) Create(ctx context.Context, conn *pgxpool.Conn) (int, error) {
 }
 
 func (m *Manager) Update(ctx context.Context, conn *pgxpool.Conn) error {
-	tag, err := conn.Exec(ctx, `UPDATE managers SET login=$1, password=$2, name=$3, surname=$4, phone=$5, available_diagnostics=$6 WHERE id = $7`,
-		m.Login, m.Password, m.Name, m.Surname, m.Phone, m.AvailableDiagnostics, m.Id)
+	tag, err := conn.Exec(ctx, `UPDATE managers SET login=$1, password=$2, name=$3, surname=$4, phone=$5, available_diagnostics=$6, full_access=$7 WHERE id = $8`,
+		m.Login, m.Password, m.Name, m.Surname, m.Phone, m.AvailableDiagnostics, m.FullAccessManager, m.Id)
 	if err != nil {
 		return err
 	}

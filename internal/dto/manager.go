@@ -24,7 +24,7 @@ func (m Manager) ValidateUpdate() error {
 		validation.Field(&m.Password, validation.Required),
 		validation.Field(&m.Name, validation.Required),
 		validation.Field(&m.Surname, validation.Required),
-		validation.Field(&m.Phone, validation.Required),
+		//validation.Field(&m.Phone, validation.Required),
 	)
 }
 

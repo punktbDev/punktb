@@ -43,7 +43,6 @@ paths:
         "500":
           $ref: '#/components/responses/CustomError'
   /manager:
-    #  /getUserData
     get:
       tags:
         - "Менеджеры"
@@ -55,13 +54,18 @@ paths:
           $ref: '#/components/responses/CustomError'
         "500":
           $ref: '#/components/responses/CustomError'
-#    /changeUserData
     put:
       tags:
         - "Менеджеры"
       summary: "изменение данных менеджера"
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: "ID менеджера"
+          required: true
       requestBody:
-        required: true
         $ref: '#/components/requestBodies/UpdateUser'
       responses:
         "200":
@@ -71,7 +75,6 @@ paths:
         "500":
           $ref: '#/components/responses/CustomError'
   /client/is-new:
-    #    /setClientChecked
     post:
       tags:
         - Клиенты
@@ -87,7 +90,6 @@ paths:
         "500":
           $ref: '#/components/responses/CustomError'
   /clients:
-#    /getClients
     get:
       tags:
         - Клиенты
@@ -122,7 +124,6 @@ paths:
         "500":
           $ref: '#/components/responses/CustomError'
   /client/is-archive:
-#    /setClientArchive
     post:
       tags:
         - Клиенты
@@ -138,7 +139,6 @@ paths:
         "500":
           $ref: '#/components/responses/CustomError'
   /client/result:
-    #    /addResults
     post:
       tags:
         - Клиенты
@@ -170,7 +170,6 @@ paths:
         "500":
           $ref: '#/components/responses/CustomError'
   /managers:
-#    /getAllManagers
     get:
       tags:
         - Менеджеры
