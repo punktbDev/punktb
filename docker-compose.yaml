@@ -1,5 +1,3 @@
-version: "3.3"
-
 services:
   backend:
     build: .
@@ -16,9 +14,6 @@ services:
       PSQL_PORT: ${PSQL_PORT}
       PSQL_DATABASE: ${PSQL_DATABASE}
       IS_HTTPS: ${IS_HTTPS}
-      SERVER_CERT_PATH: ${SERVER_CERT_PATH}
-      PRIVATE_KEY_PATH: ${PRIVATE_KEY_PATH}
-    network_mode: bridge
 #  db:
 #    image: postgres:14.8-alpine3.18
 #    container_name: postgres
