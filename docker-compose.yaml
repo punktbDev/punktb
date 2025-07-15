@@ -14,6 +14,7 @@ services:
       PSQL_PORT: ${PSQL_PORT}
       PSQL_DATABASE: ${PSQL_DATABASE}
       IS_HTTPS: ${IS_HTTPS}
+    network_mode: host
 #  db:
 #    image: postgres:14.8-alpine3.18
 #    container_name: postgres
