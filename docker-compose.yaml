@@ -4,8 +4,8 @@ services:
     image: backend:${TAG}
     container_name: backend
     ports:
-#      - "9001:8080"
-#      - "9043:8443"
+      - "9001:8080"
+      - "9043:8443"
     environment:
       LOG_LEVEL: ${LOG_LEVEL}
       PSQL_USERNAME: ${PSQL_USERNAME}
@@ -14,7 +14,7 @@ services:
       PSQL_PORT: ${PSQL_PORT}
       PSQL_DATABASE: ${PSQL_DATABASE}
       IS_HTTPS: ${IS_HTTPS}
-    network_mode: host
+#    network_mode: bridge
 #  db:
 #    image: postgres:14.8-alpine3.18
 #    container_name: postgres
