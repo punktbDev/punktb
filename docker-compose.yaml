@@ -4,8 +4,8 @@ services:
     image: backend:${TAG}
     container_name: backend
     ports:
-      - "9001:8080"
-      - "9043:8443"
+#      - "9001:8080"
+#      - "9043:8443"
     environment:
       LOG_LEVEL: ${LOG_LEVEL}
       PSQL_USERNAME: ${PSQL_USERNAME}
