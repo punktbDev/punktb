@@ -84,6 +84,7 @@ func (m *manager) ChangeManagerData(ms *dto.Manager) error {
 		Phone:                ms.Phone,
 		AvailableDiagnostics: ms.AvailableDiagnostics,
 		FullAccessManager:    ms.IsFullAccess,
+		Active:               ms.IsActive,
 	}); err != nil {
 		return err
 	}

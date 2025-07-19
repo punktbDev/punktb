@@ -179,10 +179,16 @@ func (m *manager) ChangeManagerData(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		m.err.BadRequest(w, err, http.StatusBadRequest)
 		return
+
 	}
 
 	if err = decoder.Decode(&mg); err != nil {
 		m.err.BadRequest(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if !mg.IsAdmin {
+		m.err.BadRequest(w, errors.New(http.StatusText(http.StatusForbidden)), http.StatusForbidden)
 		return
 	}
 

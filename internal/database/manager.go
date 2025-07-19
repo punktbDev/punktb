@@ -22,6 +22,7 @@ type (
 		Surname              string `json:"surname"`
 		Phone                string `json:"phone"`
 		IsAdmin              bool   `json:"is_admin"`
+		Active               bool   `json:"active"`
 		AvailableDiagnostics []int
 		FullAccessManager    bool
 		Secret               string `json:"-"`
@@ -80,8 +81,8 @@ func (m *Manager) Create(ctx context.Context, conn *pgxpool.Conn) (int, error) {
 }
 
 func (m *Manager) Update(ctx context.Context, conn *pgxpool.Conn) error {
-	tag, err := conn.Exec(ctx, `UPDATE managers SET login=$1, password=$2, name=$3, surname=$4, phone=$5, available_diagnostics=$6, full_access=$7 WHERE id = $8`,
-		m.Login, m.Password, m.Name, m.Surname, m.Phone, m.AvailableDiagnostics, m.FullAccessManager, m.Id)
+	tag, err := conn.Exec(ctx, `UPDATE managers SET login=$1, password=$2, name=$3, surname=$4, phone=$5, available_diagnostics=$6, full_access=$7, active=$8 WHERE id = $9`,
+		m.Login, m.Password, m.Name, m.Surname, m.Phone, m.AvailableDiagnostics, m.FullAccessManager, m.Active, m.Id)
 	if err != nil {
 		return err
 	}
