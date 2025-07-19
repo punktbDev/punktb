@@ -16,11 +16,20 @@ type (
 		AddManager(mn dto.Manager) error
 		ChangeActive(id int) error
 		ChangeFullAccess(id int) error
+		SelfManager(ms *dto.Manager) error
 	}
 )
 
 func NewManager(dm domain.Manager) Manager {
 	return &manager{dm: dm}
+}
+
+func (m *manager) SelfManager(ms *dto.Manager) error {
+	if err := m.dm.SelfManager(ms); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *manager) ChangeFullAccess(id int) error {

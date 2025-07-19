@@ -27,6 +27,14 @@ type (
 		FullAccessManager    bool
 		Secret               string `json:"-"`
 	}
+	SelfManager struct {
+		Id       int    `json:"id"`
+		Login    string `json:"login"`
+		Password string `json:"password"`
+		Name     string `json:"name"`
+		Surname  string `json:"surname"`
+		Phone    string `json:"phone"`
+	}
 	ActiveManager struct {
 		Id int
 	}
@@ -34,6 +42,19 @@ type (
 		Id int
 	}
 )
+
+func (s *SelfManager) Update(ctx context.Context, conn *pgxpool.Conn) error {
+	tag, err := conn.Exec(ctx, `UPDATE managers SET login=$1, password=$2, name=$3, surname=$4, phone=$5 WHERE id = $6`,
+		s.Login, s.Password, s.Name, s.Surname, s.Phone, s.Id)
+	if err != nil {
+		return err
+	}
+
+	if tag.RowsAffected() == 0 {
+		return ErrManagerNotFound
+	}
+	return nil
+}
 
 func (f *FullAccessManager) Update(ctx context.Context, conn *pgxpool.Conn) error {
 	tag, err := conn.Exec(ctx, `UPDATE managers SET full_access = NOT (SELECT full_access FROM managers WHERE id = $1) WHERE id = $2`, f.Id, f.Id)

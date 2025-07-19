@@ -28,6 +28,17 @@ func (m Manager) ValidateUpdate() error {
 	)
 }
 
+func (m Manager) ValidateForSelfUpdate() error {
+	return validation.ValidateStruct(&m,
+		//validation.Field(&m.Id, validation.Required),
+		validation.Field(&m.Login, validation.Required),
+		validation.Field(&m.Password, validation.Required),
+		//validation.Field(&m.Name, validation.Required),
+		//validation.Field(&m.Surname, validation.Required),
+		//validation.Field(&m.Phone, validation.Required),
+	)
+}
+
 func (m Manager) ValidateCreate() error {
 	return validation.ValidateStruct(&m,
 		validation.Field(&m.Login, validation.Required),

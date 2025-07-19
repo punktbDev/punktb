@@ -8,6 +8,7 @@ import (
 	"gitlab.com/freelance/punkt-b/backend/internal/database"
 	"gitlab.com/freelance/punkt-b/backend/internal/dto"
 	"gitlab.com/freelance/punkt-b/backend/internal/service"
+	"go.uber.org/zap"
 	"net/http"
 	"strconv"
 	"strings"
@@ -23,6 +24,7 @@ type (
 		err errorResponse
 	}
 	Manager interface {
+		SelfManager(w http.ResponseWriter, r *http.Request)
 		GetUserData(w http.ResponseWriter, r *http.Request)
 		ChangeManagerData(w http.ResponseWriter, r *http.Request)
 		GetAllManagers(w http.ResponseWriter, r *http.Request)
@@ -200,6 +202,36 @@ func (m *manager) ChangeManagerData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err = m.srv.ChangeManagerData(&mg); err != nil {
+		m.err.BadRequest(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	SendResponse(http.StatusOK, w, &dto.Response{Success: true})
+}
+
+func (m *manager) SelfManager(w http.ResponseWriter, r *http.Request) {
+	decoder := json.NewDecoder(r.Body)
+
+	mg := GetManager(r)
+	zap.L().Info("change data for manager",
+		zap.String("name", mg.Name),
+		zap.String("surname", mg.Surname),
+		zap.String("login", mg.Login))
+
+	var income dto.Manager
+	if err := decoder.Decode(&income); err != nil {
+		m.err.BadRequest(w, err, http.StatusBadRequest)
+		return
+	}
+
+	income.Id = mg.Id
+
+	if err := income.ValidateForSelfUpdate(); err != nil {
+		m.err.BadRequest(w, err, http.StatusBadRequest)
+		return
+	}
+
+	if err := m.srv.SelfManager(&income); err != nil {
 		m.err.BadRequest(w, err, http.StatusInternalServerError)
 		return
 	}

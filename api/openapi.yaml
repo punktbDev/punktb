@@ -42,6 +42,27 @@ paths:
           $ref: '#/components/responses/CustomError'
         "500":
           $ref: '#/components/responses/CustomError'
+  /manager/{id}:
+    put:
+      tags:
+        - "Менеджеры"
+      summary: "изменение данных менеджера от администратора"
+      parameters:
+        - in: query
+          name: id
+          schema:
+            type: integer
+          description: "ID менеджера"
+          required: true
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUser'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "400":
+          $ref: '#/components/responses/CustomError'
+        "500":
+          $ref: '#/components/responses/CustomError'
   /manager:
     get:
       tags:
@@ -58,13 +79,6 @@ paths:
       tags:
         - "Менеджеры"
       summary: "изменение данных менеджера"
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: integer
-          description: "ID менеджера"
-          required: true
       requestBody:
         $ref: '#/components/requestBodies/UpdateUser'
       responses:
@@ -449,12 +463,8 @@ components:
         phone:
           type: string
       required:
-        - id
         - login
         - password
-        - name
-        - surname
-        - phone
     Error:
       type: object
       properties:

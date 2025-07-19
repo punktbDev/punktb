@@ -17,11 +17,27 @@ type (
 		AddManager(mn dto.Manager) error
 		ChangeActive(id int) error
 		ChangeFullAccess(id int) error
+		SelfManager(ms *dto.Manager) error
 	}
 )
 
 func NewManager(db database.Database) Manager {
 	return &manager{db: db}
+}
+
+func (m *manager) SelfManager(ms *dto.Manager) error {
+	if err := m.db.Update(&dbModel.SelfManager{
+		Id:       ms.Id,
+		Login:    ms.Login,
+		Password: ms.Password,
+		Name:     ms.Name,
+		Surname:  ms.Surname,
+		Phone:    ms.Phone,
+	}); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (m *manager) AddManager(mn dto.Manager) error {

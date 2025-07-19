@@ -47,6 +47,7 @@ func (s *server) Routes(r *mux.Router) {
 	r.HandleFunc("/login", s.login.Login).Methods(http.MethodGet)
 	r.HandleFunc("/manager", s.manager.GetUserData).Methods(http.MethodGet)
 	r.HandleFunc("/manager/{id}", s.manager.ChangeManagerData).Methods(http.MethodPut)
+	r.HandleFunc("/manager", s.manager.SelfManager).Methods(http.MethodPut)
 	r.HandleFunc("/manager/add", s.manager.AddManager).Methods(http.MethodPost)
 	r.HandleFunc("/managers", s.manager.GetAllManagers).Methods(http.MethodGet)
 	r.HandleFunc("/manager/is-active/{id}", s.manager.ChangeActive).Methods(http.MethodPut)
