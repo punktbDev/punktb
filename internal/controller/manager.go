@@ -189,7 +189,7 @@ func (m *manager) ChangeManagerData(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !mg.IsAdmin {
+	if !GetManager(r).IsAdmin {
 		m.err.BadRequest(w, errors.New(http.StatusText(http.StatusForbidden)), http.StatusForbidden)
 		return
 	}

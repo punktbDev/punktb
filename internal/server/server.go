@@ -13,6 +13,7 @@ import (
 	"go.uber.org/zap"
 	"net"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -26,8 +27,12 @@ type (
 		login       controller.Login
 		manager     controller.Manager
 		client      controller.Client
-		LoginCache  map[string]dto.Manager
 		srvManagers service.Manager
+		cache
+	}
+	cache struct {
+		m      sync.Mutex
+		logins map[string]dto.Manager
 	}
 	Server interface {
 		Run() error
@@ -91,9 +96,8 @@ func (s *server) Run() error {
 }
 
 func (s *server) fillLoginCache() {
-	s.LoginCache = make(map[string]dto.Manager, 10)
+	s.cache.logins = make(map[string]dto.Manager, 10)
 	ticker := time.NewTicker(5 * time.Second)
-
 loop:
 	for {
 		select {
@@ -103,10 +107,10 @@ loop:
 				zap.L().Debug("fillLoginCache", zap.Error(err))
 				continue loop
 			}
-			s.LoginCache = make(map[string]dto.Manager, 10)
+			s.cache.logins = make(map[string]dto.Manager, 10)
 
 			for _, v := range ms {
-				s.LoginCache[v.Login] = v
+				s.cache.logins[v.Login] = v
 			}
 		}
 	}
